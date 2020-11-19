@@ -1,24 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {Fragment, useState, useEffect} from 'react';
+import axios from 'axios';
 
 function App() {
+  const [data, setData] = useState({ hits: []});
+  const[query, setQuery] = useState('google');
+  const[search, setSearch] = useState('');
+  const [url, setUrl] = useState(
+    'https:hn.algolia.com/api/v1/search?query=facebook'
+  )
+
+  useEffect(() => {
+    const fetchData = async() => {
+      const result = await axios(url);
+      setData(result.data);
+    }
+    fetchData();
+  }, [url]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <input
+        type="text"
+        value={query}
+        onChange={event => setQuery(event.target.value)}
+      />
+      <button type="button" onClick={() => setUrl(`https:hn.algolia.com/api/v1/search?query=${query}`)}>
+        Search
+      </button>
+      <ul>
+        {data.hits.map(item => (
+          <li key={item.objectID}>
+            <a href={item.url}>{item.title}</a>
+          </li>
+        ))}
+
+      </ul>
+    </Fragment>
   );
 }
 
